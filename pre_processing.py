@@ -4,11 +4,11 @@ import cv2
 
 
 def pre_process(input_folder, output_folder):
-    
+
     # Tạo folder output nếu chưa tồn tại
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-        
+
     # Duyệt qua tất cả ảnh trong folder input
     for filename in os.listdir(input_folder):
         if (
@@ -33,13 +33,15 @@ def pre_process(input_folder, output_folder):
             mask = cv2.dilate(mask, kernel, iterations=1)
 
             # Find contours
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(
+                mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
 
             if len(contours) > 0:
-                c = max(contours, key = cv2.contourArea)
+                c = max(contours, key=cv2.contourArea)
                 x, y, w, h = cv2.boundingRect(c)
-                cropped_img = img[y:y+h, x:x+w]
+                cropped_img = img[y : y + h, x : x + w]
                 cv2.imwrite(output_path, cropped_img)
             else:
                 print(f"No skin detected in {filename}")
-
+                cv2.imwrite(output_path, img)
