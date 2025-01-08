@@ -23,12 +23,17 @@ def process_image(input_folder, output_folder):
             if image is None:
                 print("Image not found")
                 continue
-            # Khử nhiễu với Gaussian Filter
+            # Khử nhiễu với Gaussian Filter , phương sai bằng 1
             denoised_image = cv2.GaussianBlur(image, (3, 3), 1)
 
-            # Làm sắc nét với Unsharp Mask
-            sharp_kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-            sharpened_image = cv2.filter2D(denoised_image, -1, sharp_kernel)
+            # Khử nhiễu muối tiêu bằng medianBlur
+            denoised_image_median = cv2.medianBlur(denoised_image, 3)
 
-            # Save the processed image
+            # Làm sắc nét với Unsharp Mask
+            blurred = cv2.GaussianBlur(image, (5, 5), 0)
+            sharpened_image = cv2.addWeighted(
+                denoised_image_median, 1.5, blurred, -0.5, 0
+            )
+
+            # Lưu ảnh
             cv2.imwrite(output_path, sharpened_image)

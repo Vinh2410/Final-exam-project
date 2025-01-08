@@ -22,8 +22,16 @@ def pre_process(input_folder, output_folder):
             img = cv2.imread(input_path)
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL)
 
-            # Khoảng giá trị HSV cho màu da (ví dụ)
-            lower_skin = np.array([0, 20, 70])
+            # Khoảng giá trị HSV cho màu da
+            """
+            Không gian màu HSV (Hue, Saturation, Value - Sắc độ, Độ bão hòa, Độ sáng) 
+
+            Hue: Thường nằm trong khoảng từ 0 đến 20.
+            Saturation: Có thể thay đổi từ 20 đến 255, tùy thuộc vào độ bão hòa của màu da.
+            Value: Cũng thay đổi từ 20 đến 255, tùy thuộc vào độ sáng của màu da.
+
+            """
+            lower_skin = np.array([0, 20, 20])
             upper_skin = np.array([20, 255, 255])
 
             mask = cv2.inRange(hsv, lower_skin, upper_skin)
@@ -32,11 +40,12 @@ def pre_process(input_folder, output_folder):
             kernel = np.ones((5, 5), np.uint8)
             mask = cv2.dilate(mask, kernel, iterations=1)
 
-            # Find contours
+            # Các đường viền (contour) trong mặt nạ được tìm thấy. Contour là các đường bao quanh các vùng có cùng màu.
             contours, _ = cv2.findContours(
                 mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
             )
 
+            # Cắt ảnh
             if len(contours) > 0:
                 c = max(contours, key=cv2.contourArea)
                 x, y, w, h = cv2.boundingRect(c)
